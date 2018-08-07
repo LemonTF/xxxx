@@ -1,0 +1,12 @@
+*.o
+.deps/
+Makefile
+config.log
+config.status
+config_test
+fmttest
+libzlog.so
+logger
+shmtest
+test
+
