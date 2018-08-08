@@ -3,14 +3,17 @@ AM_SOURCES=clock.h log.cpp log.h log_queue.cpp log_queue.h ztomic.h tools.cpp to
 AM_CPPFLAGS=-Wall -pthread -m64 -std=c++11 -fPIC
 AM_LDFLAGS= -Wall -pthread -m64 -std=c++11 -fPIC
 
-bin_PROGRAMS=libzlog.so 
+lib_LTLIBRARIES=libzlog.la
+
 noinst_PROGRAMS=logger test config_test shmtest fmttest
 AM_CPPFLAGS+=
 AM_LDFLAGS+=
 
-libzlog_so_SOURCES=${AM_SOURCES}
-libzlog_so_CPPFLAGS=${AM_CPPFLAGS}
-libzlog_so_LDFLAGS=${AM_LDFLAGS} -shared -lrt
+include_HEADERS=log.h
+
+libzlog_la_SOURCES=${AM_SOURCES}
+libzlog_la_CPPFLAGS=${AM_CPPFLAGS}
+libzlog_la_LDFLAGS=${AM_LDFLAGS} -shared -lrt
 
 logger_SOURCES=logger.cpp config_file.cpp
 logger_LDFLAGS=${AM_LDFLAGS} -lrt -L. -lzlog -lboost_regex 

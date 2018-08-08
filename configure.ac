@@ -5,6 +5,7 @@ AC_PREREQ([2.69])
 AC_INIT([zlog], [1.0], [BUG-REPORT-ADDRESS])
 AM_INIT_AUTOMAKE([foreign -Wall])
 AC_CONFIG_MACRO_DIR([m4])
+LT_INIT
 
 # Checks for programs.
 AC_PROG_CXX
