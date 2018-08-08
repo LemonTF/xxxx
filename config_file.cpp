@@ -35,7 +35,7 @@ int config_file::open(const char*fname)
 
 	if(!f)
 	{
-		log_errno("can't open the inifile:",fname);
+		log_errno("can't open the inifile:%s",fname);
 		return -1;
 	}
 

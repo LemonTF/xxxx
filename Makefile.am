@@ -4,8 +4,9 @@ AM_CPPFLAGS=-Wall -pthread -m64 -std=c++11 -fPIC
 AM_LDFLAGS= -Wall -pthread -m64 -std=c++11 -fPIC
 
 lib_LTLIBRARIES=libzlog.la
+bin_PROGRAMS=logger 
+noinst_PROGRAMS=test config_test shmtest fmttest
 
-noinst_PROGRAMS=logger test config_test shmtest fmttest
 AM_CPPFLAGS+=
 AM_LDFLAGS+=
 

@@ -199,7 +199,7 @@ static std::shared_ptr<logger> read_config(config_file*f, const char*log_name)
 std::atomic<int> g_quit_event(0);
 int main(int argc,char*argv[]) 
 { 
-	const char*cfg_file="log.ini";
+	const char*cfg_file="../etc/log.ini";
 
 	for(int i=1;i<argc;i++)
 	{
