@@ -85,17 +85,54 @@ int config_file::open(const char*fname)
 	return 0;
 }
 
-const char* config_file::get(const char*sec,const char*key,const char*v)
+int config_file::get(const char*key,int default_v)const
 {
-	char k[256];
+	auto it=_map.find(key);
+
+	return it==_map.end()
+			?  (log_info("config param: %s=%d(default)",key,default_v),default_v) 
+			:  (log_info("config param: %s=%d",key,it->second), atoi(it->second));
+}
+
+int config_file::get(const char*sec,const char*key,int default_v)const
+{
+	char k[512];
 	sprintf(k,"%s.%s",sec,key);
+
+	return get(k,default_v);
+}
+
+double config_file::get(const char*key,double default_v)const
+{
+	auto it=_map.find(key);
+
+	return it==_map.end()
+			?  (log_info("config param: %s=%lf(default)",key,default_v),default_v) 
+			:  (log_info("config param: %s=%lf",key,it->second), atof(it->second));
+}
+
+double config_file::get(const char*sec,const char*key,double default_v)const
+{
+	char k[512];
+	sprintf(k,"%s.%s",sec,key);
+
+	return get(k,default_v);
+}
+
+const char* config_file::get(const char*sec,const char*key,const char*v)const
+{
+	char k[512];
+	sprintf(k,"%s.%s",sec,key);
+	return get(k,v);
+#if 0
 	auto it=_map.find(k);
 	return it==_map.end()
 			?  get(k,v)
 			:  (log_info("config param: %s=%s",k,it->second),it->second);
+#endif
 }
 
-const char* config_file::get(const char*key,const char*defv)
+const char* config_file::get(const char*key,const char*defv)const
 {
 	auto it=_map.find(key);
 
@@ -104,7 +141,7 @@ const char* config_file::get(const char*key,const char*defv)
 			:  (log_info("config param: %s=%s",key,it->second), it->second);
 }
 
-std::set<const char*> config_file::keys()
+std::set<const char*> config_file::keys()const
 {
 	std::set<const char*> ret;
 	for(auto it:_map)
@@ -113,14 +150,14 @@ std::set<const char*> config_file::keys()
 	return std::move(ret);
 }
 
-bool config_file::contains(const char*k)
+bool config_file::contains(const char*k)const
 {
 	return _map.find(k)!=_map.end();
 }
 
-bool config_file::contains(const char*sec,const char*k)
+bool config_file::contains(const char*sec,const char*k)const
 {
-	char key[256];
+	char key[512];
 	snprintf(key,255,"%s.%s",sec,k);
 	return contains(key);
 }

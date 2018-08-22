@@ -5,7 +5,7 @@ AM_LDFLAGS= -Wall -pthread -m64 -std=c++11 -fPIC
 
 lib_LTLIBRARIES=libzlog.la
 bin_PROGRAMS=logger 
-noinst_PROGRAMS=test config_test shmtest fmttest
+noinst_PROGRAMS=test shmtest fmttest cct
 
 AM_CPPFLAGS+=
 AM_LDFLAGS+=
@@ -28,8 +28,8 @@ shmtest_LDFLAGS=${AM_LDFLAGS} -lrt
 fmttest_SOURCES=fmttest.cpp tools.cpp 
 fmttest_LDFLAGS=${AM_LDFLAGS} -lrt 
 
-config_test_SOURCES=config_test.cpp config_file.cpp
-config_test_LDFLAGS=${AM_LDFLAGS} -lrt -L. -lboost_regex -lzlog
+cct_SOURCES=config_test.cpp config_file.cpp
+cct_LDFLAGS=${AM_LDFLAGS} -lrt -L. -lboost_regex -lzlog
 
 
 DEFS= 

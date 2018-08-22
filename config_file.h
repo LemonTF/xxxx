@@ -26,13 +26,20 @@ public:
 
 	int open(const char*fname);
 
-	const char* get(const char*key,const char*v);
-	const char* get(const char*sec,const char*key,const char*v);
 
-	std::set<const char*> keys();
+	int get(const char*key,int default_v)const;
+	int get(const char*sec,const char*key,int default_v)const;
 
-	bool contains(const char*k);
-	bool contains(const char*sec,const char*k);
+	double get(const char*key,double default_v)const;
+	double get(const char*sec,const char*key,double default_v)const;
+
+	const char* get(const char*key,const char*default_v)const;
+	const char* get(const char*sec,const char*key,const char*default_v)const;
+
+	std::set<const char*> keys()const;
+
+	bool contains(const char*k)const ;
+	bool contains(const char*sec,const char*k)const;
 
 	void print(std::ostream&o);
 };

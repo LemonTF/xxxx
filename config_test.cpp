@@ -19,6 +19,9 @@ void test(const char*fname)
 
 	log_info("contains(%s)=%d","main.file",config.contains("main.file"));
 	log_info("contains(%s)=%d","a",config.contains("a"));
+
+	config.get("undefined2",0);
+	config.get("undefined1",nullptr);
 	
 	std::cout<<"-------------------------------------------------------\n";
 	config.print(std::cout);
