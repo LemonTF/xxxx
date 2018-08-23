@@ -10,7 +10,7 @@ noinst_PROGRAMS=test shmtest fmttest cct
 AM_CPPFLAGS+=
 AM_LDFLAGS+=
 
-include_HEADERS=log.h
+include_HEADERS=log.h config_file.h
 
 libzlog_la_SOURCES=${AM_SOURCES}
 libzlog_la_CPPFLAGS=${AM_CPPFLAGS}

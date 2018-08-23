@@ -91,7 +91,7 @@ int config_file::get(const char*key,int default_v)const
 
 	return it==_map.end()
 			?  (log_info("config param: %s=%d(default)",key,default_v),default_v) 
-			:  (log_info("config param: %s=%d",key,it->second), atoi(it->second));
+			:  (log_info("config param: %s=%s",key,it->second), atoi(it->second));
 }
 
 int config_file::get(const char*sec,const char*key,int default_v)const
@@ -108,7 +108,7 @@ double config_file::get(const char*key,double default_v)const
 
 	return it==_map.end()
 			?  (log_info("config param: %s=%lf(default)",key,default_v),default_v) 
-			:  (log_info("config param: %s=%lf",key,it->second), atof(it->second));
+			:  (log_info("config param: %s=%s",key,it->second), atof(it->second));
 }
 
 double config_file::get(const char*sec,const char*key,double default_v)const
