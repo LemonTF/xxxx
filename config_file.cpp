@@ -1,12 +1,9 @@
 #include <string>
 #include <fstream>
 #include <iterator>
-#include <boost/regex.hpp>
+
 #include <log.h>
 #include <config_file.h>
-
-using boost::regex;
-using boost::cmatch;
 
 static void trim(char*b,char*e)
 {
