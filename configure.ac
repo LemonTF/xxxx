@@ -11,7 +11,6 @@ LT_INIT
 AC_PROG_CXX
 AC_PROG_CC
 
-AC_CHECK_LIB([boost_regex], [main])
 AC_CHECK_LIB([rt], [main])
 
 AC_CHECK_HEADERS([memory.h stdint.h stdlib.h string.h sys/time.h unistd.h])

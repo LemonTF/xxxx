@@ -17,7 +17,7 @@ libzlog_la_CPPFLAGS=${AM_CPPFLAGS}
 libzlog_la_LDFLAGS=${AM_LDFLAGS} -shared -lrt
 
 logger_SOURCES=logger.cpp config_file.cpp
-logger_LDFLAGS=${AM_LDFLAGS} -lrt -L. -lzlog -lboost_regex 
+logger_LDFLAGS=${AM_LDFLAGS} -lrt -L. -lzlog 
 
 test_SOURCES=test.cpp 
 test_LDFLAGS=${AM_LDFLAGS} -lrt -L.  -ldl -lzlog
@@ -29,8 +29,7 @@ fmttest_SOURCES=fmttest.cpp tools.cpp
 fmttest_LDFLAGS=${AM_LDFLAGS} -lrt 
 
 cct_SOURCES=config_test.cpp config_file.cpp
-cct_LDFLAGS=${AM_LDFLAGS} -lrt -L. -lboost_regex -lzlog
-
+cct_LDFLAGS=${AM_LDFLAGS} -lrt -L. -lzlog
 
 DEFS= 
 EXTRA_DIST= clock.h config_file.cpp config_file.h config_test.cpp log.cpp logger.cpp log.h \

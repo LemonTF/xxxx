@@ -92,6 +92,9 @@ struct log_header
 		return i1<i2?i1:i2;
 	}
 
+
+//-----------|-------------|-----------------|>>>>>>>>
+//           g             c                 n
 	void print(const char*s,int len)
 	{
 		uint64_t npos=ztomic::load(&_npos);
@@ -128,14 +131,15 @@ struct log_header
 		c.reset();
 		for(uint32_t i=0;;i++)
 		{
-			uint64_t cpos=ztomic::load(&_cpos);
-			if(ztomic::cas(&_cpos,&npos,npos+len))
+//			uint64_t cpos=ztomic::load(&_cpos);
+			uint64_t n=npos;
+			if(ztomic::cas(&_cpos,&n,n+len))
 				break;
 
-			if(cpos>npos)
+			if(n>=npos)
 				break;
 
-			if(cpos<npos && i>500 && c.count_ms()>200)//超时的话，直接设置提交指针
+			if(n<npos && i>500 && c.count_ms()>200)//超时的话，直接设置提交指针
 			{
 				ztomic::store(&_cpos,npos+len);
 				break;
@@ -229,6 +233,8 @@ int log_queue::open(const char*name,size_t queue_size)
 	while(size<queue_size)
 		size<<=1;
 
+
+	std_info("share memory fname:%s",name);
 	if(_shm.open(name,size+sizeof(log_header))<0)
 		return -1;
 

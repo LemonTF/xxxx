@@ -20,6 +20,7 @@ struct logp_config
 	int m_show_thread=1;
 	int m_show_level=1;
 	int m_show_srcline=1;
+	int m_print_stdout=1;
 	int m_level=0;
 	log_queue*m_queue=nullptr;
 
@@ -41,6 +42,7 @@ struct logp_config
 	int show_level()const{return m_show_level==1;}
 	int show_srcline()const{return m_show_srcline==1;}
 	int show_thread()const{return m_show_thread==1;}
+	int print_stdout()const{return m_print_stdout==1;}
 
 };
 
@@ -91,12 +93,14 @@ static std::shared_ptr<logp_config> read_config(config_file*f, const char*log_na
 	const char* show_level=f->get(log_name,"show_level","1");
 	const char* show_srcline=f->get(log_name,"show_srcline","1");
 	const char* show_thread=f->get(log_name,"show_thread","1");
+	const char* print_stdout=f->get(log_name,"print_stdout","1");
 
 	auto ret=std::make_shared<logp_config>(level_index(level),log.release());
 
 	ret->m_show_level=show_level[0]=='1'?1:0;
 	ret->m_show_thread=show_thread[0]=='1'?1:0;
 	ret->m_show_srcline=show_srcline[0]=='1'?1:0;
+	ret->m_print_stdout=print_stdout[0]=='1'?1:0;
 
 	return ret;
 }
@@ -221,6 +225,12 @@ static void print_impl(int id,const char*fname,int line,int level,const char*fmt
 	}
 	else
 	{
+		if(lc->print_stdout())
+		{
+			printf("%s",b1);
+			fflush(stdout);
+		}
+
 		lc->m_queue->put(b1,n);
 	}
 	if(b1)free(b1);

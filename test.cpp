@@ -6,14 +6,12 @@
 
 int main() 
 { 
-	log_init("log.ini");
+	log_init("../etc/log.ini");
 
-	std::string s(1<<20,'1');
+	std::string s(100,'1');
 	for(int i=0;;i++)
 	{
-		log_info("%s","123456789");
-		usleep(10);
-//		std::cin.get();
+		log_info("%s",s.c_str());
 	}
 
 	std::this_thread::yield();

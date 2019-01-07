@@ -19,7 +19,7 @@ struct log_file
 {
 	std::string _fname; //文件名模板 /home/zzj/test.log
 	FILE*   _fp;
-	long    _min_size;//文件切割的最大的字节数，当达到这个字节数后，下个对其时间将切换日志文件
+	long    _min_size;//文件切割的最大的字节数，当达到这个字节数后，下个对齐时间将切换日志文件
 	long    _cur_size;//当前文件的大小
 	time_t	_last_time;//最后操作文件的时间
 	int 	_time_align;//日志文件名对齐的时间，支持 dhm -- 天、小时、分钟
@@ -133,6 +133,7 @@ struct logger
 	std::shared_ptr<log_queue>   m_queue;
 	std::shared_ptr<log_file>    m_file;
 	zclock m_clock;
+	size_t size_a=0;
 
 	logger(std::shared_ptr<log_queue> shm_queue,std::shared_ptr<log_file> log_file)
 		:m_queue(shm_queue)
@@ -146,12 +147,16 @@ struct logger
 		char   buff[1<<16];
 
 		while((size=m_queue->get(buff,sizeof(buff)))>0)
+		{
 			m_file->put(buff,size);
+			size_a+=size;
+		}
 
-		if(m_clock.count_ms()>200)
+		if(m_clock.count_ms()>200 && size_a>0)
 		{
 			m_file->flush();
 			m_clock.reset();
+			size_a=0;
 		}
 
 		m_queue->keep_alive();
