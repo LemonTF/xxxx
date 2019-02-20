@@ -20,7 +20,7 @@ struct logp_config
 	int m_show_thread=1;
 	int m_show_level=1;
 	int m_show_srcline=1;
-	int m_print_stdout=1;
+	int m_print_stdout=0;
 	int m_level=0;
 	log_queue*m_queue=nullptr;
 
@@ -93,7 +93,7 @@ static std::shared_ptr<logp_config> read_config(config_file*f, const char*log_na
 	const char* show_level=f->get(log_name,"show_level","1");
 	const char* show_srcline=f->get(log_name,"show_srcline","1");
 	const char* show_thread=f->get(log_name,"show_thread","1");
-	const char* print_stdout=f->get(log_name,"print_stdout","1");
+	const char* print_stdout=f->get(log_name,"print_stdout","0");
 
 	auto ret=std::make_shared<logp_config>(level_index(level),log.release());
 
