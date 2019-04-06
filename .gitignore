@@ -9,4 +9,23 @@ libzlog.so
 logger
 shmtest
 test
+bs/
+Makefile.in
+autom4te.cache/output.5
+autom4te.cache/requests
+autom4te.cache/traces.5
+cct
+config.guess
+config.sub
+libtool
+libzlog.la
+libzlog_la-config_file.lo
+libzlog_la-log.lo
+libzlog_la-log_queue.lo
+libzlog_la-sysv_shm.lo
+libzlog_la-tools.lo
+ltmain.sh
+m4
+nohup.out
+.lib*
 
