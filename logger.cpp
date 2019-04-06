@@ -15,22 +15,55 @@
 
 #include "log.h"
 
+#include <dirent.h>
+#include <string.h>
+#include <fnmatch.h>
+
+static void dir_clean(const char*dir,const char*pattern,int count)
+{
+	struct dirent **namelist;
+	int n = scandir(dir, &namelist, NULL, alphasort);
+
+	if (n < 0)
+		return;
+
+	char fname[512];
+	strcpy(fname,dir);
+	strcat(fname,"/");
+	char*p=&fname[strlen(fname)];
+
+	for (int i=n-1;i>=0;i--)
+	{
+		if(0==fnmatch(pattern,namelist[i]->d_name,0) && count--<=0)
+		{
+			strcpy(p,namelist[i]->d_name);
+			remove(fname);
+			printf("remove file:%s\n",fname);
+		}
+		free(namelist[i]);
+	}
+	free(namelist);
+}
+
+
 struct log_file
 {
 	std::string _fname; //文件名模板 /home/zzj/test.log
 	FILE*   _fp;
-	long    _min_size;//文件切割的最大的字节数，当达到这个字节数后，下个对齐时间将切换日志文件
-	long    _cur_size;//当前文件的大小
+	long _min_size;//文件切割的最大的字节数，当达到这个字节数后，下个对齐时间将切换日志文件
+	long _cur_size;//当前文件的大小
 	time_t	_last_time;//最后操作文件的时间
 	int 	_time_align;//日志文件名对齐的时间，支持 dhm -- 天、小时、分钟
+	int     _file_count;
 
 	zclock  _err_clock,_check_dir_clock;
 
-	log_file(const boost::string_ref&fpath,uint32_t min_size=10,int time_align='h')
+	log_file(const boost::string_ref&fpath,int file_count=0,int min_size=10,int time_align='h')
 		:_fname(fpath)
 		,_fp(0)
-		,_min_size(min_size<<20)
+		,_min_size((1LL*min_size)<<20)
 		,_cur_size(0)
+		,_file_count(file_count)
 	{
 		switch(time_align)
 		{
@@ -73,6 +106,24 @@ struct log_file
 		return name;
 	}
 
+	void check_file_count()
+	{
+		if(!_file_count)
+			return;
+
+		int pos1=_fname.find_last_of('/');
+		if(pos1==-1)
+			return;
+
+		std::string fn=_fname.substr(pos1+1);
+		int pos2=fn.find_last_of('.');
+		if(pos2==-1)
+			return;
+		fn.insert(pos2,"_*");
+
+		dir_clean(_fname.substr(0,pos1).c_str(),fn.c_str(),_file_count);
+	}
+
 	int reopen()
 	{
 		if(_fp) fclose(_fp);
@@ -81,6 +132,7 @@ struct log_file
 		_cur_size=(uint32_t)ftell(_fp);
 
 		_check_dir_clock.reset();
+		check_file_count();
 		return 0;
 	}
 
@@ -184,6 +236,7 @@ static std::shared_ptr<logger> read_config(config_file*f, const char*log_name)
 
 	const char* qsize=f->get(log_name,"queue_size","2048");
 	const char* min_size=f->get(log_name,"min_size","10");
+	const char* file_count=f->get(log_name,"file_count","0");
 	const char* time_align=f->get(log_name,"time_align","m");
 
 	std::unique_ptr<log_queue> queue(new log_queue());
@@ -203,7 +256,7 @@ static std::shared_ptr<logger> read_config(config_file*f, const char*log_name)
 		return nullptr;
 	}
 	
-	std::unique_ptr<log_file> file(new log_file(fname, atoi(min_size),time_align[0]));
+	std::unique_ptr<log_file> file(new log_file(fname, atoi(file_count), atoi(min_size),time_align[0]));
 	std_info("初始化日志%s成功:{文件名=%s, 输出队列大小=%dkB, 最小切换大小=%dMB, 切换对齐时间=%c}",
 		log_name,fname,atoi(qsize),atoi(min_size),time_align[0]);
 
