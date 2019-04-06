@@ -12,6 +12,7 @@ int main()
 	for(int i=0;;i++)
 	{
 		log_info("%s",s.c_str());
+		usleep(10000);
 	}
 
 	std::this_thread::yield();

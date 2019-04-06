@@ -24,7 +24,7 @@ struct log_file
 	time_t	_last_time;//最后操作文件的时间
 	int 	_time_align;//日志文件名对齐的时间，支持 dhm -- 天、小时、分钟
 
-	zclock  _err_clock;
+	zclock  _err_clock,_check_dir_clock;
 
 	log_file(const boost::string_ref&fpath,uint32_t min_size=10,int time_align='h')
 		:_fname(fpath)
@@ -80,6 +80,7 @@ struct log_file
 		_fp=fopen(_fname.c_str(),"a+");
 		_cur_size=(uint32_t)ftell(_fp);
 
+		_check_dir_clock.reset();
 		return 0;
 	}
 
@@ -101,6 +102,14 @@ struct log_file
 			close();
 			rename(_fname.c_str(),mkname(_fname).c_str());
 			reopen();
+		}
+
+		if(_check_dir_clock.count_ms()>1000)
+		{
+			if(access(_fname.c_str(),0)==-1)
+				reopen();
+
+			_check_dir_clock.reset();
 		}
 
 		int rc=fwrite(p,1,len,_fp);
