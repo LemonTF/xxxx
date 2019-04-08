@@ -62,9 +62,21 @@ int config_file::open(const char*fname)
 			s=p+1;
 			continue;
 		}
-		char*r=strchr(v+1,'#');
-		if(r) *r=0;
-		else r=p;
+
+		char*r=v;
+
+		for(;r;)
+		{
+			r=strchr(r+1,'#');
+
+			if(r && (*(r-1)==' ' ||*(r-1)=='\t')) 
+			{
+				*r=0;
+				break;
+			}
+		}
+
+		if(r==0) r=p;
 
 		char*k=s;
 		*p=0;
