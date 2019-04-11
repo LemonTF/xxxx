@@ -15,6 +15,7 @@
 #include <log_queue.h>
 #include <config_file.h>
 
+
 struct logp_config
 {
 	int m_show_thread=1;
@@ -23,6 +24,9 @@ struct logp_config
 	int m_print_stdout=0;
 	int m_level=0;
 	log_queue*m_queue=nullptr;
+
+	std::vector<char*> m_exclude;
+	std::vector<char> m_exclude_buf;
 
 	logp_config()
 	{
@@ -44,6 +48,60 @@ struct logp_config
 	int show_thread()const{return m_show_thread==1;}
 	int print_stdout()const{return m_print_stdout==1;}
 
+	static void trim(char*b,char*e)
+	{
+		char*e1=e;
+		for(;e1>b;--e1)
+		{
+			if(!std::isspace(e1[-1]))
+				break;
+		}
+
+		char*b1=b;
+		for(;b1<e1;++b1)
+		{
+			if(!std::isspace(*b1))
+				break;
+		}
+
+		memmove(b,b1,e1-b1);
+		b[e1-b1]=0;
+	}
+
+	void set_exclude(const char*e)
+	{
+		if(e==nullptr || *e==0)
+			return;
+	
+		m_exclude.clear();
+		m_exclude_buf.assign(e,e+strlen(e)+1);
+
+		char*s=&*m_exclude_buf.begin();
+		for(;*s;)
+		{
+			char*p=strtok_r(s,",",&s);
+			trim(p,p+strlen(p));
+			if(strlen(p)==0)
+				continue;
+			m_exclude.push_back(p);
+		}
+
+		for(auto p:m_exclude)
+		{
+			printf("exclude:%s\n",p);
+		}
+	}
+
+	bool in_exclude(const char*msg)const
+	{
+		for(auto e:m_exclude)
+		{
+			if(strstr(msg,e))
+				return true;
+		}
+
+		return false;
+	}
 };
 
 std::atomic<int> g_log_inited(-2);
@@ -94,6 +152,7 @@ static std::shared_ptr<logp_config> read_config(config_file*f, const char*log_na
 	const char* show_srcline=f->get(log_name,"show_srcline","1");
 	const char* show_thread=f->get(log_name,"show_thread","1");
 	const char* print_stdout=f->get(log_name,"print_stdout","0");
+	const char* exclude=f->get(log_name,"exclude","");
 
 	auto ret=std::make_shared<logp_config>(level_index(level),log.release());
 
@@ -101,6 +160,7 @@ static std::shared_ptr<logp_config> read_config(config_file*f, const char*log_na
 	ret->m_show_thread=show_thread[0]=='1'?1:0;
 	ret->m_show_srcline=show_srcline[0]=='1'?1:0;
 	ret->m_print_stdout=print_stdout[0]=='1'?1:0;
+	ret->set_exclude(exclude);
 
 	return ret;
 }
@@ -223,7 +283,7 @@ static void print_impl(int id,const char*fname,int line,int level,const char*fmt
 		printf("%s",b1);
 		fflush(stdout);
 	}
-	else
+	else if(!lc->in_exclude(b1))
 	{
 		if(lc->print_stdout())
 		{

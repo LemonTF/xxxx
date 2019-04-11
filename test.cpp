@@ -35,17 +35,23 @@ void dir_clean(const char*dir,const char*pattern,int count)
 
 int main() 
 { 
-	dir_clean("/home/zzj/ya-src/dist/log","yals_*.log",3);
-	dir_clean("../dist/log","yals_*.log",3);
+//	dir_clean("/home/zzj/ya-src/dist/log","yals_*.log",3);
+//	dir_clean("../dist/log","yals_*.log",3);
+
+	char *s=(char*)malloc(128);
+	strcpy(s,"abc,de,,f,g");
+	char*p=0;
+
+	for(;*s;)
+		p=strtok_r(s,",",&s);
 	
 	log_init("../etc/log.ini");
 
-	std::string s(100,'1');
-	for(int i=0;;i++)
-	{
-		log_info("%s",s.c_str());
-		usleep(10);
-	}
+	log_info("%s","this is a test.");
+	log_info("%s","I'm lht.");
+	log_info("%s","I'm zzj.");
+
+
 
 	std::this_thread::yield();
 	return 0;
