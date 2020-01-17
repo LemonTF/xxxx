@@ -55,6 +55,7 @@ struct log_file
 	time_t	_last_time;//最后操作文件的时间
 	int 	_time_align;//日志文件名对齐的时间，支持 dhm -- 天、小时、分钟
 	int     _file_count;
+    time_t _tm;
 
 	zclock  _err_clock,_check_dir_clock;
 
@@ -77,7 +78,7 @@ struct log_file
 				_time_align=3600; 
 				break;
 		}
-
+        time(&_tm);
 		time(&_last_time);
 		reopen();
 	}
@@ -88,13 +89,13 @@ struct log_file
 	inline std::string str_time()
 	{
 		char buf[128];
-		time_t tm=time(0);
-		const struct tm*t=localtime(&tm);
+		//time_t tm=time(0);
+		const struct tm*t=localtime(&_tm);
 
 		size_t n=
-			_time_align==3600?sprintf(buf,"_%02d%02d%02d" , t->tm_mon+1,t->tm_mday,t->tm_hour)
-            : _time_align==60  ?sprintf(buf,"_%02d%02d%02d%02d" , t->tm_mon+1,t->tm_mday, t->tm_hour, t->tm_min)
-            : sprintf(buf,"_%02d%02d" , t->tm_mon+1,t->tm_mday);
+			_time_align==3600?sprintf(buf,"_%02d%02d%02d%02d" ,(1900+t->tm_year)%100, t->tm_mon+1,t->tm_mday,t->tm_hour)
+            : _time_align==60  ?sprintf(buf,"_%02d%02d%02d%02d%02d" ,(1900+t->tm_year)%100, t->tm_mon+1,t->tm_mday, t->tm_hour, t->tm_min)
+            : sprintf(buf,"_%02d%02d%02d" ,(1900+t->tm_year)%100,t->tm_mon+1,t->tm_mday);
 
 		return std::string(buf,n);
 	}
@@ -120,7 +121,6 @@ struct log_file
 		if(pos2==-1)
 			return;
 		fn.insert(pos2,"_*");
-
 		dir_clean(_fname.substr(0,pos1).c_str(),fn.c_str(),_file_count);
 	}
 
@@ -130,6 +130,7 @@ struct log_file
 
 		_fp=fopen(_fname.c_str(),"a+");
 		_cur_size=(uint32_t)ftell(_fp);
+        _tm=time(0);
 
 		_check_dir_clock.reset();
 		check_file_count();
@@ -152,7 +153,9 @@ struct log_file
 		if(_cur_size+len>_min_size && _last_time/_time_align != ct/_time_align)
 		{
 			close();
-			rename(_fname.c_str(),mkname(_fname).c_str());
+			if(-1==rename(_fname.c_str(),mkname(_fname).c_str())){
+                std_error("lemon.rename_error..%s-->%s",_fname.c_str(),mkname(_fname).c_str());
+            }
 			reopen();
 		}
 
