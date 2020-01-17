@@ -1,6 +1,7 @@
 *.o
 .deps/
 Makefile
+a.out
 config.log
 config.status
 config_test
@@ -12,6 +13,7 @@ test
 bs/
 Makefile.in
 autom4te.cache/output.5
+autom4te.cache/*
 autom4te.cache/requests
 autom4te.cache/traces.5
 cct
@@ -25,7 +27,7 @@ libzlog_la-log_queue.lo
 libzlog_la-sysv_shm.lo
 libzlog_la-tools.lo
 ltmain.sh
-m4
+*.m4
 nohup.out
 .lib*
 
